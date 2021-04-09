@@ -165,3 +165,32 @@ def serveo():
 				print(e)
 				pass
 		time.sleep(2)
+
+def server():
+	print('\n' + G + '[+]' + C + ' Port : '+ W + str(port))
+	print('\n' + G + '[+]' + C + ' Starting PHP Server......' + W, end='')
+	with open('logs/php.log', 'w') as phplog:
+		subp.Popen(['php', '-S', '0.0.0.0:{}'.format(port), '-t', 'template/{}/'.format(site)], stdout=phplog, stderr=phplog)
+		time.sleep(3)
+	try:
+		php_rqst = requests.get('http://0.0.0.0:{}/index.html'.format(port))
+		php_sc = php_rqst.status_code
+		if php_sc == 200:
+			print(C + '[' + G + ' Success ' + C + ']' + W)
+		else:
+			print(C + '[' + R + 'Status : {}'.format(php_sc) + C + ']' + W)
+	except requests.ConnectionError:
+		print(C + '[' + R + ' Failed ' + C + ']' + W)
+		Quit()
+    
+def wait():
+    printed = False
+    while True:
+        time.sleep(2)
+        size = os.path.getsize(result)
+        if size == 0 and printed = False:
+            print('\n' + G + '[+]' + C + ' Waiting for User Interaction...' + W + '\n')
+            printed = True
+        if size > 0:
+            main()
+
